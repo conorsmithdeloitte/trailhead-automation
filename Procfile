@@ -1,1 +1,1 @@
-web: go-trailhead-leaderboard-api
+web: trailhead-automation

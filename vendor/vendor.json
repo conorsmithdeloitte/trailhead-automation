@@ -3,7 +3,7 @@
 	"ignore": "test",
 	"heroku": {
         "install" : [ "./..." ],
-        "goVersion": "go1.14"
+        "goVersion": "go1.18.3"
 	},
 	"package": [
 		{
@@ -13,5 +13,5 @@
 			"revisionTime": "2020-01-12T19:17:43Z"
 		}
 	],
-	"rootPath": "github.com/meruff/go-trailhead-leaderboard-api"
+	"rootPath": "github.com/conorsmithdeloitte/trailhead-automation"
 }
