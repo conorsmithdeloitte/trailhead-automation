@@ -1,0 +1,4 @@
+github.com/conorsmithdeloitte/trailhead-automation v0.0.0-20220616233834-373af03d372f h1:0t6D8rH18iWbD8lZyXdH6dg07Gvmh3fM0n117GU/rbo=
+github.com/conorsmithdeloitte/trailhead-automation v0.0.0-20220616233834-373af03d372f/go.mod h1:fzv/Pn1ODX/AmdYuRzDXdrLeWDYJtfe8Zpw0jXSmUGw=
+github.com/gorilla/mux v1.7.4 h1:VuZ8uybHlWmqV03+zRzdwKL4tUnIp1MAQtp1mIFE1bc=
+github.com/gorilla/mux v1.7.4/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=

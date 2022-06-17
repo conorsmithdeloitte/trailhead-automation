@@ -1,0 +1,6 @@
+# github.com/conorsmithdeloitte/trailhead-automation v0.0.0-20220616233834-373af03d372f
+## explicit
+github.com/conorsmithdeloitte/trailhead-automation/trailhead
+# github.com/gorilla/mux v1.7.4
+## explicit; go 1.12
+github.com/gorilla/mux
