@@ -137,8 +137,8 @@ func certificationsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// trailheadData := doTrailheadAuraCallout(trailhead.GetApexAction("AchievementService", "fetchAchievements", userID, "", ""), "")
-	trailheadData := doTrailheadAuraCallout(trailhead.GetApexAction("TrailheadProfileService", "fetchTrailheadBadges", userID, "", ""), "")
+	trailheadData := doTrailheadAuraCallout(trailhead.GetApexAction("AchievementService", "fetchAchievements", userID, "", ""), "")
+	//trailheadData := doTrailheadAuraCallout(trailhead.GetApexAction("TrailheadProfileService", "fetchTrailheadBadges", userID, "", ""), "")
 	if trailheadData.Actions != nil {
 		w.Header().Set("Content-Type", "application/json")
 		//json.NewEncoder(w).Encode(trailheadData.Actions[0].ReturnValue.ReturnValue.CertificationsResult)
