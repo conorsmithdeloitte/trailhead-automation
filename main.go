@@ -142,7 +142,7 @@ func certificationsHandler(w http.ResponseWriter, r *http.Request) {
 	if trailheadData.Actions != nil {
 		w.Header().Set("Content-Type", "application/json")
 		//json.NewEncoder(w).Encode(trailheadData.Actions[0].ReturnValue.ReturnValue.CertificationsResult)
-		json.NewEncoder(w).Encode(trailheadData.Actions[0].ReturnValue.ReturnValue.SuperbadgesResult)
+		json.NewEncoder(w).Encode(trailheadData.Actions[0].ReturnValue.ReturnValue)
 	} else {
 		writeErrorToBrowser(w, `{"error":"No data returned from Trailhead."}`, 503)
 	}
