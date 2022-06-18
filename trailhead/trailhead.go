@@ -9,17 +9,22 @@ type Data struct {
 		State       string `json:"state"`
 		ReturnValue struct {
 			ReturnValue struct {
-				Body                 string `json:"body"`
-				SuperbadgesResult    string `json:"superbadgesResult"`
+				Body              string `json:"body"`
+				SuperbadgesResult string `json:"superbadgesResult"`
+				// Test123           struct {
+				// 	CertificationsList []struct {
+				// 		Title string `json:"testing122"`
+				// 	}
+				// } `json:"Test123"`
 				CertificationsResult struct {
 					CertificationsList []struct {
-						CertificationImageURL string `json:"certificationImageUrl"`
-						CertificationStatus   string `json:"certificationStatus"`
-						CertificationURL      string `json:"certificationUrl"`
-						DateCompleted         string `json:"dateCompleted"`
-						DateExpired           string `json:"dateExpired"`
-						Description           string `json:"description"`
-						Title                 string `json:"title"`
+						// CertificationImageURL string `json:"certificationImageUrl"`
+						// CertificationStatus   string `json:"certificationStatus"`
+						// CertificationURL      string `json:"certificationUrl"`
+						// DateCompleted         string `json:"dateCompleted"`
+						// DateExpired           string `json:"dateExpired"`
+						Description string `json:"description"`
+						Title       string `json:"title"`
 					} `json:"certificationsList"`
 					StatusCode    string `json:"statusCode"`
 					StatusMessage string `json:"statusMessage"`
@@ -51,7 +56,7 @@ func GetAuraContext(fwUID string, loaded string) string {
         "mode":"PROD",
         "fwuid":"` + fwUID + `",
         "app":"c:ProfileApp",
-        "loaded":`+ loaded + `,
+        "loaded":` + loaded + `,
         "dn":[],
         "globals":{
             "srcdoc":true
