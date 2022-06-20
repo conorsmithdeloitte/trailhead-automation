@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -24,6 +25,7 @@ var auraContext = ""
 
 func main() {
 	r := mux.NewRouter()
+	r.HandleFunc("/trailblazer/{id}/test", testHandler)
 	r.HandleFunc("/trailblazer/{id}", trailblazerHandler)
 	r.HandleFunc("/trailblazer/{id}/profile", profileHandler)
 	r.HandleFunc("/trailblazer/{id}/badges", badgesHandler)
@@ -40,6 +42,32 @@ func main() {
 	} else {
 		http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	}
+}
+
+func testHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userID := getTrailheadID(w, vars["id"])
+	if userID == "" {
+		return
+	}
+
+	resp, err := http.Get("https://reqres.in/api/users?page=2")
+	if err != nil {
+		fmt.Println("No response from request")
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body) // response body is []byte
+	fmt.Println(string(body))              // convert to string before print
+
+	trailheadData := doTrailheadAuraCallout(trailhead.GetApexAction("AchievementService", "fetchAchievements", userID, "", ""), "")
+	if trailheadData.Actions != nil {
+		w.Header().Set("Content-Type", "application/json")
+		//json.NewEncoder(w).Encode(trailheadData.Actions[0].ReturnValue.ReturnValue.CertificationsResult)
+		json.NewEncoder(w).Encode(trailheadData.Actions[0].ReturnValue.ReturnValue)
+	} else {
+		writeErrorToBrowser(w, `{"error":"No data returned from Trailhead."}`, 503)
+	}
+
 }
 
 // trailblazerHandler gets a basic overview of the Trailblazer i.e. profile counts, recent badges, and skills.
@@ -317,6 +345,8 @@ func doTrailheadCallout(messagePayload string) trailhead.Data {
 	body, err := ioutil.ReadAll(res.Body)
 	var trailheadData trailhead.Data
 	json.Unmarshal(body, &trailheadData)
+
+	fmt.Println(string(body))
 
 	return trailheadData
 }
