@@ -19,11 +19,13 @@ const (
 	trailblazerMe               = "https://trailblazer.me/id/"
 	trailblazerMeApexExec       = "https://trailblazer.me/aura?r=0&aura.ApexAction.execute=2"
 	trailblazerProfileAppConfig = "https://trailblazer.me/c/ProfileApp.app?aura.format=JSON&aura.formatAdapter=LIGHTNING_OUT"
+	trailblazerTestAura         = "https://trailblazer.me/aura"
 )
 
 var auraContext = ""
 
 func main() {
+
 	r := mux.NewRouter()
 	r.HandleFunc("/trailblazer/{id}/test", testHandler)
 	r.HandleFunc("/trailblazer/{id}", trailblazerHandler)
@@ -51,15 +53,7 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := http.Get("https://reqres.in/api/users?page=2")
-	if err != nil {
-		fmt.Println("No response from request")
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body) // response body is []byte
-	fmt.Println(string(body))              // convert to string before print
-
-	trailheadData := doTrailheadAuraCallout(trailhead.GetApexAction("AchievementService", "fetchAchievements", userID, "", ""), "")
+	trailheadData := doTrailheadAuraCallout(trailhead.GetApexAction("TrailheadProfileService", "fetchTrailheadData", userID, "", ""), "")
 	if trailheadData.Actions != nil {
 		w.Header().Set("Content-Type", "application/json")
 		//json.NewEncoder(w).Encode(trailheadData.Actions[0].ReturnValue.ReturnValue.CertificationsResult)
@@ -67,6 +61,14 @@ func testHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		writeErrorToBrowser(w, `{"error":"No data returned from Trailhead."}`, 503)
 	}
+
+	// resp, err := http.Get("https://reqres.in/api/users?page=2")
+	// if err != nil {
+	// 	fmt.Println("No response from request")
+	// }
+	// defer resp.Body.Close()
+	// body, err := ioutil.ReadAll(resp.Body) // response body is []byte
+	// fmt.Println(string(body))              // convert to string before print
 
 }
 
@@ -166,10 +168,9 @@ func certificationsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	trailheadData := doTrailheadAuraCallout(trailhead.GetApexAction("AchievementService", "fetchAchievements", userID, "", ""), "")
-	//trailheadData := doTrailheadAuraCallout(trailhead.GetApexAction("TrailheadProfileService", "fetchTrailheadBadges", userID, "", ""), "")
 	if trailheadData.Actions != nil {
 		w.Header().Set("Content-Type", "application/json")
-		//json.NewEncoder(w).Encode(trailheadData.Actions[0].ReturnValue.ReturnValue.CertificationsResult)
+		json.NewEncoder(w).Encode(trailheadData.Actions[0].ReturnValue.ReturnValue.CertificationsResult)
 		json.NewEncoder(w).Encode(trailheadData.Actions[0].ReturnValue.ReturnValue)
 	} else {
 		writeErrorToBrowser(w, `{"error":"No data returned from Trailhead."}`, 503)
@@ -343,10 +344,11 @@ func doTrailheadCallout(messagePayload string) trailhead.Data {
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
+	fmt.Println("Testing123", string(body))
 	var trailheadData trailhead.Data
 	json.Unmarshal(body, &trailheadData)
 
-	fmt.Println(string(body))
+	log.Println("Test", string(body))
 
 	return trailheadData
 }

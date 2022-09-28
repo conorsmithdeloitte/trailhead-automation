@@ -1,7 +1,5 @@
 package trailhead
 
-import "strings"
-
 // Data represent a response from trailhead.salesforce.com
 type Data struct {
 	Actions []struct {
@@ -69,34 +67,60 @@ func GetAuraContext(fwUID string, loaded string) string {
 func GetApexAction(className string, methodName string, userID string, skip string, filter string) string {
 	actionString :=
 		`{
-            "id":"212;a",
-            "descriptor":"aura://ApexActionController/ACTION$execute",
-            "callingDescriptor":"UNKNOWN",
-            "params":{
-                "namespace":"",
-                "classname":"` + className + `",
-                "method":"` + methodName + `",
-                "params":{
-                    "userId":"` + userID + `",
-                    "language":"en-US"`
+		"descriptor": "aura://ApexActionController/ACTION$execute",
+		"params": {
+			"namespace": "",
+			"classname": "TrailheadProfileService",
+			"method": "fetchTrailheadData",
+			"params": {
+				"userId":"` + userID + `"
+			},
+			"cacheable": false,
+			"isContinuation": false
+		},
+	}`
+	// actionString :=
+	// 	`{
+	//         "id":"212;a",
+	//         "descriptor":"aura://ApexActionController/ACTION$execute",
+	//         "callingDescriptor":"UNKNOWN",
+	//         "params":{
+	//             "namespace":"",
+	//             "classname":"",
+	//             "method":"",
+	//             "params":{
+	//                 "userId":"` + userID + `",
+	//                 "language":"en-US"`
+	// // actionString :=
+	// // 	`{
+	// //         "id":"212;a",
+	// //         "descriptor":"aura://ApexActionController/ACTION$execute",
+	// //         "callingDescriptor":"UNKNOWN",
+	// //         "params":{
+	// //             "namespace":"",
+	// //             "classname":"` + className + `",
+	// //             "method":"` + methodName + `",
+	// //             "params":{
+	// //                 "userId":"` + userID + `",
+	// //                 "language":"en-US"`
 
-	if skip != "" {
-		actionString += `,
-                    "skip":` + skip + `,
-                    "perPage":30`
-	}
+	// if skip != "" {
+	// 	actionString += `,
+	//                 "skip":` + skip + `,
+	//                 "perPage":30`
+	// }
 
-	if filter != "" {
-		actionString += `,
-					"filter":"` + strings.Title(filter) + `"`
-	}
+	// if filter != "" {
+	// 	actionString += `,
+	// 				"filter":"` + strings.Title(filter) + `"`
+	// }
 
-	actionString += `
-                },
-				"cacheable":false,
-				"isContinuation":false
-			}
-		}`
+	// actionString += `
+	//             },
+	// 			"cacheable":false,
+	// 			"isContinuation":false
+	// 		}
+	// 	}`
 
 	return actionString
 }
