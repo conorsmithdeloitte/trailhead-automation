@@ -20,6 +20,7 @@ const (
 	trailblazerMeApexExec       = "https://trailblazer.me/aura?r=0&aura.ApexAction.execute=2"
 	trailblazerProfileAppConfig = "https://trailblazer.me/c/ProfileApp.app?aura.format=JSON&aura.formatAdapter=LIGHTNING_OUT"
 	trailblazerTestAura         = "https://trailblazer.me/aura"
+	badgeAPIURL                 = "https://badge-scraper.herokuapp.com/trailblazer/?username="
 )
 
 var auraContext = ""
@@ -27,6 +28,7 @@ var auraContext = ""
 func main() {
 
 	r := mux.NewRouter()
+	r.HandleFunc("/trailblazer/{id}/ddsa", DDSAHandler)
 	r.HandleFunc("/trailblazer/{id}/test", testHandler)
 	r.HandleFunc("/trailblazer/{id}", trailblazerHandler)
 	r.HandleFunc("/trailblazer/{id}/profile", profileHandler)
@@ -44,6 +46,68 @@ func main() {
 	} else {
 		http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 	}
+}
+
+func DDSAHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userAlias := vars["id"]
+	if strings.HasPrefix(userAlias, "005") {
+		writeErrorToBrowser(w, `{"error":"/profile requires a Trailblazer handle, not an ID as a parameter."}`, 503)
+		return
+	}
+
+	badgeres, badgeerr := http.Get(badgeAPIURL + vars["id"])
+	profres, proferr := http.Get(trailblazerMe + userAlias)
+	if profres != nil && badgeres != nil {
+		defer badgeres.Body.Close()
+		defer profres.Body.Close()
+	}
+
+	if proferr != nil || badgeerr != nil {
+		log.Println(proferr)
+		log.Println(badgeerr)
+		writeErrorToBrowser(w, `{"error":"Problem retrieving profile data."}`, 503)
+		return
+	}
+
+	badgebody, badgeerr := ioutil.ReadAll(badgeres.Body)
+	profbody, proferr := ioutil.ReadAll(profres.Body)
+	if proferr != nil || badgeerr != nil {
+		log.Println(proferr)
+		writeErrorToBrowser(w, `{"error":"Problem retrieving profile data."}`, 503)
+		return
+	}
+
+	jsonString := strings.Replace(string(profbody), "\\'", "\\\\'", -1)
+	if !strings.Contains(jsonString, "var profileData = JSON.parse(") {
+		writeErrorToBrowser(w, `{"error":"Problem retrieving profile data."}`, 503)
+		return
+	}
+
+	jsonString = jsonString[strings.Index(jsonString, "var profileData = JSON.parse(")+29 : strings.Index(jsonString, "trailblazer.me\\\"}\");")+18]
+
+	out, err := strconv.Unquote(jsonString)
+	if err != nil {
+		log.Println(err)
+		writeErrorToBrowser(w, `{"error":"Problem retrieving profile data."}`, 503)
+		return
+	}
+	out = strings.Replace(out, "\\'", "'", -1)
+
+	userID := getTrailheadID(w, vars["id"])
+	if userID == "" {
+		return
+	}
+	certificationbody := []byte{}
+	trailheadData := doTrailheadAuraCallout(trailhead.GetApexAction("AchievementService", "fetchAchievements", userID, "", ""), "")
+	if trailheadData.Actions != nil {
+		certificationbody, _ = json.Marshal(trailheadData.Actions[0].ReturnValue.ReturnValue.CertificationsResult)
+	} else {
+		writeErrorToBrowser(w, `{"error":"Problem retrieving certification data."}`, 503)
+	}
+
+	writeJSONToBrowser(w, `{"Profile":`+out+`,"Certification:`+string(certificationbody)+`,"Badge":`+string(badgebody)+`}`)
+
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
@@ -145,18 +209,25 @@ func badgesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	skip, badgesFilter := vars["offset"], vars["filter"]
-	if skip == "" {
-		skip = "0"
+	res, err := http.Get(badgeAPIURL + vars["id"])
+	if res != nil {
+		defer res.Body.Close()
 	}
 
-	trailheadData := doTrailheadAuraCallout(trailhead.GetApexAction("TrailheadProfileService", "fetchTrailheadBadges", userID, skip, badgesFilter), "")
-
-	if trailheadData.Actions != nil {
-		writeJSONToBrowser(w, trailheadData.Actions[0].ReturnValue.ReturnValue.Body)
-	} else {
-		writeErrorToBrowser(w, `{"error":"No data returned from Trailhead."}`, 503)
+	if err != nil {
+		log.Println(err)
+		writeErrorToBrowser(w, `{"error":"Problem retrieving profile data."}`, 503)
+		return
 	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Println(err)
+		writeErrorToBrowser(w, `{"error":"Problem retrieving profile data."}`, 503)
+		return
+	}
+
+	writeJSONToBrowser(w, string(body))
 }
 
 // certificationsHandler gets Salesforce certifications the Trailblazer has earned.
