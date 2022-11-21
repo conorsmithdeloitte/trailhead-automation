@@ -216,14 +216,14 @@ func badgesHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println(err)
-		writeErrorToBrowser(w, `{"error":"Problem retrieving profile data."}`, 503)
+		writeErrorToBrowser(w, `{"error":"Problem retrieving badge data."}`, 503)
 		return
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		log.Println(err)
-		writeErrorToBrowser(w, `{"error":"Problem retrieving profile data."}`, 503)
+		writeErrorToBrowser(w, `{"error":"Problem retrieving badge data."}`, 503)
 		return
 	}
 
