@@ -1,2 +1,2 @@
-api: trailhead-automation
-web: gunicorn badge_scraper:app
+web: trailhead-automation
+api: gunicorn badge_scraper:app
