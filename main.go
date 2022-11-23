@@ -36,7 +36,7 @@ func main() {
 	r.HandleFunc("/trailblazer/{id}/badges/{filter}", badgesHandler)
 	r.HandleFunc("/trailblazer/{id}/badges/{filter}/{offset}", badgesHandler)
 	r.HandleFunc("/trailblazer/{id}/certifications", certificationsHandler)
-	r.PathPrefix("/").HandlerFunc(catchAllHandler)
+	//r.PathPrefix("/").HandlerFunc(catchAllHandler)
 	r.Use(loggingHandler)
 	http.Handle("/", r)
 
